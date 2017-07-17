@@ -1,0 +1,76 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="721dde9c-4cd6-404d-aa0a-f888e67e1c45"
+	Name="DH - CM - Revenue Recognition Default Query"
+	Description="A view defined for querying on revenue recognition default records"
+	Author="Dignity Health"
+	IsRoot="false"
+	PrimaryKeyField="ID"
+	RecordType="Revenue Recognition Default"
+	c:SecurityUIFolder="DignityHealth\ConstituentManagement"
+	>
+
+	<!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_V_QUERY_DH_CM_REVENUERECOGNITIONDEFAULT">
+		<ViewSQL>
+			<![CDATA[
+        SELECT 
+          RRD.ID,
+          RRD.SOURCECONSTITUENTID,
+          RRD.RECIPIENTCONSTITUENTID,
+          RRD.MATCHFACTOR,
+          RRD.STARTDATE,
+          RRD.ENDDATE,
+          RRTC.DESCRIPTION AS REVENUERECOGNITIONTYPE,
+          ADDEDBY.APPLICATIONNAME AS ADDEDBY_APPLICATION,
+          ADDEDBY.USERNAME AS ADDEDBY_USERNAME,
+          CHANGEDBY.APPLICATIONNAME AS CHANGEDBY_APPLICATION,
+          CHANGEDBY.USERNAME AS CHANGEDBY_USERNAME,
+          RRD.DATEADDED,
+          RRD.DATECHANGED,
+          RRD.TSLONG
+        FROM 
+          dbo.REVENUERECOGNITIONDEFAULT RRD
+            INNER JOIN REVENUERECOGNITIONTYPECODE RRTC
+              ON RRTC.ID = RRD.REVENUERECOGNITIONTYPECODEID
+            INNER JOIN CHANGEAGENT as ADDEDBY
+              ON ADDEDBY.ID = RRD.ADDEDBYID
+            INNER JOIN CHANGEAGENT AS CHANGEDBY
+              ON CHANGEDBY.ID = RRD.CHANGEDBYID
+	     WHERE
+		    RRD.PREVENTRECOGNITIONSDEFAULTING = 0
+			]]>
+		</ViewSQL>
+	</ViewImplementation>
+
+	<!-- describe each field in the view output -->
+	<Output>
+		<OutputFields>
+			<OutputField Caption="System record ID" Category="System Fields" Name="ID" />
+      <OutputField Name="SOURCECONSTITUENTID" Caption="Source constituent ID" Category="System Fields" IsHidden="true" />
+      <OutputField Name="RECIPIENTCONSTITUENTID" Caption="Recipient constituent ID" Category="System Fields" IsHidden="true" />
+      <OutputField Name="MATCHFACTOR" Caption="Match factor" DataType="Decimal" />
+      <OutputField Name="STARTDATE" Caption="Start date" DataType="Date" />
+      <OutputField Name="ENDDATE" Caption="End date" DataType="Date" />
+      <OutputField Name="REVENUERECOGNITIONTYPE" Caption="Revenue recogniton type" DataType="String">
+        <LookupInfo>
+          <CodeTable CodeTableName="REVENUERECOGNITIONTYPECODE" IncludeInactive="true" UseCodeTableEntrySecurity="true"/>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" DataType="String" Category ="System Fields" />
+      <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" DataType="String" Category ="System Fields" />
+      <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" DataType="String" Category ="System Fields" />
+      <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" DataType="String" Category ="System Fields" />
+      <OutputField Name="DATEADDED" Caption="Date added" DataType="Date" Category ="System Fields" />
+      <OutputField Name="DATECHANGED" Caption="Date changed" DataType="Date" Category ="System Fields" />
+      <OutputField Name="TSLONG" Caption="Timestamp value" DataType="Long" Category ="System Fields" IsHidden="true" />
+    </OutputFields>
+	</Output>
+
+  <RelationshipOperations>
+    <AddToParentView Field="SOURCECONSTITUENTID" ParentView="V_QUERY_CONSTITUENT" ParentViewRelatedField="ID" PathAlias="Revenue Recognition Defaults"/>
+    <AddRelatedView Field="RECIPIENTCONSTITUENTID" RelatedView="V_QUERY_CONSTITUENT" RelatedField="ID" PathAlias="Revenue Recognition Default Recipient"/>
+  </RelationshipOperations>
+</QueryViewSpec>
+
